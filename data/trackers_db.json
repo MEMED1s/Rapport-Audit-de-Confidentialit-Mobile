@@ -1,0 +1,46 @@
+{
+    "trackers": [
+        {
+            "name": "Firebase Analytics",
+            "package": "com.google.firebase.analytics",
+            "category": "Analytics",
+            "risk": "medium"
+        },
+        {
+            "name": "Google Ads / AdMob",
+            "package": "com.google.android.gms.ads",
+            "category": "Advertising",
+            "risk": "high"
+        },
+        {
+            "name": "Facebook SDK",
+            "package": "com.facebook",
+            "category": "Social",
+            "risk": "high"
+        },
+        {
+            "name": "Crashlytics",
+            "package": "com.google.firebase.crashlytics",
+            "category": "Crash Reporting",
+            "risk": "low"
+        },
+        {
+            "name": "AppsFlyer",
+            "package": "com.appsflyer",
+            "category": "Attribution",
+            "risk": "high"
+        },
+        {
+            "name": "InMobi",
+            "package": "com.inmobi",
+            "category": "Advertising",
+            "risk": "high"
+        },
+        {
+            "name": "Branch",
+            "package": "io.branch",
+            "category": "Attribution",
+            "risk": "medium"
+        }
+    ]
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Posture Analyzer - Advanced Audit</title>
+    <style>
+        /* Thème Cyber Dark Mode */
+        :root { 
+            --bg-main: #0b1121; 
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --primary: #38bdf8; 
+            --accent: #0ea5e9; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --success: #10b981; 
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: radial-gradient(circle at top, #1e293b, var(--bg-main)); 
+            color: var(--text-main);
+            margin: 0; 
+            padding: 30px; 
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 1100px; 
+            margin: auto; 
+            background: var(--bg-card); 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px; 
+        }
+
+        .header { 
+            text-align: center; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+        }
+
+        h1 { color: var(--text-main); font-weight: 800; letter-spacing: 1px; margin-bottom: 5px; }
+        .header p { color: var(--primary); font-size: 1.1em; margin-top: 0; }
+
+        /* Score Animé et Lumineux */
+        .score-box { 
+            font-size: 50px; 
+            font-weight: 900; 
+            color: white; 
+            width: 110px; 
+            height: 110px; 
+            line-height: 110px; 
+            border-radius: 50%; 
+            margin: 15px auto;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        /* Onglets stylisés */
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+        }
+        .tab { 
+            padding: 12px 20px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+        }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { color: var(--primary); }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            box-shadow: 0 -2px 10px var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Animations de contenu */
+        .content { display: none; }
+        .content.active { 
+            display: block; 
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Cartes intérieures */
+        .card { 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            padding: 18px; 
+            border-radius: 10px; 
+            margin-bottom: 12px; 
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
+
+        .ai-summary { 
+            background: rgba(14, 165, 233, 0.1); 
+            border-left: 4px solid var(--accent); 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 0 8px 8px 0;
+            line-height: 1.6;
+        }
+
+        .check-item { 
+            display: flex; align-items: center; gap: 12px; 
+            margin-bottom: 12px; padding: 15px; 
+            background: rgba(15, 23, 42, 0.6); 
+            border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .tag { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 12px; margin-left: 10px; }
+        .danger-text { color: var(--danger); font-weight: bold; }
+        ul { line-height: 1.7; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🛡️ Privacy Posture Analyzer</h1>
+        <p>Audit Dynamique du package : <strong id="pkg-name" style="color: white;">--</strong></p>
+        <div id="score-circle" class="score-box">0</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Security Score</div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab(event, 'overview')">📊 Overview</div>
+        <div class="tab" onclick="showTab(event, 'perms')">🔓 Permissions</div>
+        <div class="tab" onclick="showTab(event, 'trackers')">📡 Trackers</div>
+        <div class="tab" onclick="showTab(event, 'data')">🗄️ Data Flow</div>
+        <div class="tab" onclick="showTab(event, 'checklist')">✅ Checklist</div>
+        <div class="tab" onclick="showTab(event, 'ai')">🧠 AI Insights</div>
+    </div>
+
+    <div id="overview" class="content active">
+        <h3 style="color: var(--primary);">Résumé de l'Application</h3>
+        <div class="card">
+            <p><strong>Package Name:</strong> <span id="out-pkg" style="color: white;">--</span></p>
+            <p><strong>Audit Profile:</strong> <span id="out-profile" style="color: white; text-transform: uppercase;">--</span></p>
+            <p><strong>Menaces potentielles:</strong> <span id="threat-level">--</span></p>
+        </div>
+    </div>
+
+    <div id="perms" class="content">
+        <h3 style="color: var(--primary);">Permissions Android Détectées</h3>
+        <div id="list-perms"></div>
+    </div>
+
+    <div id="trackers" class="content">
+        <h3 style="color: var(--primary);">SDKs & Trackers Publicitaires</h3>
+        <div id="list-trackers"></div>
+    </div>
+
+    <div id="data" class="content">
+        <h3 style="color: var(--primary);">Accès aux Données Sensibles</h3>
+        <div class="card">
+            <p>Analyse heuristique des flux de données potentiels :</p>
+            <ul id="list-data" style="color: #cbd5e1;"></ul>
+        </div>
+    </div>
+
+    <div id="checklist" class="content">
+        <h3 style="color: var(--primary);">Checklist de Conformité Technique</h3>
+        <div id="check-list"></div>
+    </div>
+
+    <div id="ai" class="content">
+        <h3 style="color: var(--primary);">Audit Intelligent (Powered by Gemini)</h3>
+        <div class="ai-summary">
+            <h4 style="margin-top:0; color: var(--primary);">Executive Summary</h4>
+            <p id="ai-exec" style="font-style: italic; min-height: 60px;">Connexion à l'IA en cours...</p>
+        </div>
+        <div style="display: flex; gap: 20px;">
+            <div style="flex: 1; background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <h4 style="color: var(--danger); margin-top: 0;">⚠️ Critical Findings</h4>
+                <ul id="ai-findings"></ul>
+            </div>
+            <div style="flex: 1; background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <h4 style="color: var(--success); margin-top: 0;">🛡️ Recommendations</h4>
+                <ul id="ai-recs"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logique des onglets
+    function showTab(e, id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active');
+        
+        // Relancer l'effet machine à écrire si on clique sur l'onglet AI
+        if(id === 'ai' && !window.aiTyped) {
+            typeWriter(document.getElementById('ai-exec'), window.aiText, 15);
+            window.aiTyped = true; // Pour ne le faire qu'une fois
+        }
+    }
+
+    // Animation du Compteur (Le Waouh Effect du score)
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Effet Machine à écrire pour l'IA
+    function typeWriter(element, text, speed) {
+        element.innerHTML = "";
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        type();
+    }
+
+    // Récupération des données
+    fetch('../output/analysis_result.json')
+        .then(res => res.json())
+        .then(data => {
+            // Vue d'ensemble
+            document.getElementById('pkg-name').innerText = data.app_info.package_name;
+            document.getElementById('out-pkg').innerText = data.app_info.package_name;
+            document.getElementById('out-profile').innerText = data.app_info.profile;
+            
+            // Animation du Score et Couleurs (Glow Effect)
+            const score = data.privacy_score;
+            const circle = document.getElementById('score-circle');
+            let color = score < 50 ? '#ef4444' : (score < 75 ? '#f59e0b' : '#10b981');
+            
+            circle.style.backgroundColor = 'transparent';
+            circle.style.border = `4px solid ${color}`;
+            circle.style.boxShadow = `0 0 30px ${color}80, inset 0 0 20px ${color}40`; // Effet Neon
+            
+            document.getElementById('threat-level').innerHTML = score < 50 ? '<span class="danger-text">CRITIQUE</span>' : 'Modérée';
+            
+            animateValue(circle, 0, score, 2000); // Anime de 0 au score en 2 secondes
+
+            // Permissions
+            const perms = data.manifest_analysis.permissions;
+            document.getElementById('list-perms').innerHTML = perms.map(p => {
+                let permName = p.split('.').pop();
+                let dangerIcon = (permName.includes('LOCATION') || permName.includes('CONTACTS') || permName.includes('STORAGE')) ? '🔥' : '📄';
+                return `<div class="card">${dangerIcon} <strong>${permName}</strong> <span class="tag" style="float:right;">${p}</span></div>`;
+            }).join('');
+
+            // Trackers
+            const trackers = data.trackers_analysis;
+            document.getElementById('list-trackers').innerHTML = trackers.map(t => 
+                `<div class="card">🎯 <b style="color:white; font-size:1.1em;">${t.name}</b> <span class="tag">${t.category}</span></div>`
+            ).join('') || "<div class='card'>✅ Aucun tracker détecté.</div>";
+
+            // Onglet DATA
+            const dataTypes = [];
+            if(perms.some(p => p.includes('LOCATION'))) dataTypes.push("📍 Géolocalisation précise (GPS)");
+            if(perms.some(p => p.includes('ACCOUNTS'))) dataTypes.push("👤 Identifiants de compte utilisateur");
+            if(perms.some(p => p.includes('STORAGE'))) dataTypes.push("📁 Fichiers locaux et Médias");
+            if(perms.some(p => p.includes('CAMERA'))) dataTypes.push("📸 Accès direct à la caméra");
+            document.getElementById('list-data').innerHTML = dataTypes.map(d => `<li>${d}</li>`).join('') || "<li>✅ Aucun flux critique détecté.</li>";
+
+            // Onglet CHECKLIST
+            const checklist = [
+                { label: "Analyse Structurelle du Manifest", status: true },
+                { label: "Détection des Trackers & SDK", status: trackers.length > 0 },
+                { label: "Validation de la configuration AllowBackup", status: !data.manifest_analysis.allow_backup },
+                { label: "Génération de l'Audit IA (Gemini)", status: !!data.ai_insights.executive_summary }
+            ];
+            document.getElementById('check-list').innerHTML = checklist.map(c => `
+                <div class="check-item">
+                    <span class="check-icon">${c.status ? '🟢' : '🔴'}</span>
+                    <span style="color: white; font-weight:500;">${c.label}</span>
+                </div>
+            `).join('');
+
+            // AI Insights (Préparation du texte pour la machine à écrire)
+            const ai = data.ai_insights;
+            window.aiText = ai.executive_summary || "Erreur de quota Gemini."; // Stocké pour l'animation
+            document.getElementById('ai-findings').innerHTML = (ai.critical_findings || []).map(f => `<li style="margin-bottom:10px;">${f}</li>`).join('');
+            document.getElementById('ai-recs').innerHTML = (ai.recommendations || []).map(r => `<li style="margin-bottom:10px;">${r}</li>`).join('');
+        });
+</script>
+</body>
+</html>

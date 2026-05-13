@@ -1,0 +1,14 @@
+[
+    {
+        "name": "InMobi",
+        "package": "com.inmobi",
+        "category": "Advertising",
+        "risk": "high"
+    },
+    {
+        "name": "Firebase Analytics",
+        "package": "com.google.firebase.analytics",
+        "category": "Analytics",
+        "risk": "medium"
+    }
+]
